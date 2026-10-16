@@ -78,6 +78,7 @@ func TestMetaColorize(t *testing.T) {
 	}
 }
 
+// Without any flags or ENVs set, input defaults to the standard terraform.InputModeStd.
 func TestMetaInputMode(t *testing.T) {
 	uiInput := ui.NewUIInputForTests(
 		ui.UIInputOptions{},
@@ -88,18 +89,13 @@ func TestMetaInputMode(t *testing.T) {
 	m.testingOverrides = &testingOverrides{
 		UIInput: uiInput,
 	}
-	args := []string{}
-
-	fs := m.extendedFlagSet("foo")
-	if err := fs.Parse(args); err != nil {
-		t.Fatalf("err: %s", err)
-	}
 
 	if m.InputMode() != terraform.InputModeStd {
 		t.Fatalf("bad: %#v", m.InputMode())
 	}
 }
 
+// ENVs can control if input is enabled or disabled, with different values.
 func TestMetaInputMode_envVar(t *testing.T) {
 	// Ask for input
 	uiInput := ui.NewUIInputForTests(
@@ -110,12 +106,6 @@ func TestMetaInputMode_envVar(t *testing.T) {
 	m := new(Meta)
 	m.testingOverrides = &testingOverrides{
 		UIInput: uiInput,
-	}
-	args := []string{}
-
-	fs := m.extendedFlagSet("foo")
-	if err := fs.Parse(args); err != nil {
-		t.Fatalf("err: %s", err)
 	}
 
 	off := terraform.InputMode(0)
@@ -149,12 +139,11 @@ func TestMetaInputMode_disable(t *testing.T) {
 	m.testingOverrides = &testingOverrides{
 		UIInput: uiInput,
 	}
-	args := []string{"-input=false"}
 
-	fs := m.extendedFlagSet("foo")
-	if err := fs.Parse(args); err != nil {
-		t.Fatalf("err: %s", err)
-	}
+	// In a command implementation, the -input flag would need to be parsed by logic in the `arguments`
+	// package, and the returned value used to set the `input` field on the Meta.
+	// So, this test simply verifies that the input mode is disabled when (Meta).input is false
+	m.input = false
 
 	if m.InputMode() > 0 {
 		t.Fatalf("bad: %#v", m.InputMode())
