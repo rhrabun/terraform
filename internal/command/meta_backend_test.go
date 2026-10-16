@@ -3484,10 +3484,6 @@ func testMetaBackend(t *testing.T) *Meta {
 	view, _ := testView(t)
 	m.View = view
 	m.process(args)
-	f := m.extendedFlagSet("test")
-	if err := f.Parse(args); err != nil {
-		t.Fatalf("unexpected error: %s", err)
-	}
 
 	// metaBackend tests are verifying migrate actions
 	m.migrateState = true
